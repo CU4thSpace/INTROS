@@ -20,16 +20,19 @@
     padding:.6rem 1.25rem;background:var(--bg);border-bottom:1px solid rgba(255,255,255,0.2)}
   .bar .name{font-size:1.4rem;font-weight:bold;color:var(--white)}
   .bar .name span{font-weight:100;font-style:italic;color:var(--ink);margin-left:.5rem}
-  .tools{display:flex;gap:10px;align-items:center}
+  .tools{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .langs{display:flex;gap:4px;padding-right:10px;margin-right:2px;border-right:1px solid rgba(255,255,255,0.25)}
   .btn{font-family:var(--font);font-size:1.2rem;color:var(--white);background:var(--btn);border:none;border-radius:8px;
     min-width:50px;height:50px;padding:0 1rem;cursor:pointer}
   .btn:hover{background:var(--btn-hover)}
   .btn.warn{background:#912338}
+  .btn[aria-pressed="true"]{background:var(--white);color:#111;font-weight:bold}
   .btn:focus-visible,.field:focus-visible,.tod:focus-visible{outline:3px solid var(--white);outline-offset:2px}
 
   main{max-width:62rem;margin:2rem auto 5rem;padding:0 1.25rem}
   .script{border:6px solid var(--white);padding:clamp(1.25rem,4vw,3rem)}
   .script p{margin:0 0 1.1em;font-size:var(--size);opacity:.95}
+  .script i{color:#b5b5b5}
   .part{font-size:1.4rem !important;font-weight:100;font-style:italic;color:var(--dim);letter-spacing:.02em;opacity:1 !important}
 
   .field{display:block;width:100%;margin:0 0 .9rem;padding:.5rem .8rem;resize:none;overflow:hidden;min-height:3.2rem;
@@ -40,20 +43,25 @@
 
   .sep{border:0;border-top:2px solid rgba(255,255,255,0.25);margin:2.5rem 0}
   .tod{font-family:var(--font);font-size:inherit;font-weight:bold;color:var(--white);background:var(--field);
-    border:2px solid var(--white);border-radius:8px;padding:0 .4rem}
+    border:2px solid var(--white);border-radius:8px;padding:0 .4rem;max-width:100%}
   .tod option{background:#222;color:#fff}
   .pick{font-size:1.1rem;height:50px;max-width:18rem;padding:0 .6rem}
   [hidden]{display:none !important}
 
   .status{position:fixed;left:1.25rem;bottom:1rem;font-size:1rem;color:var(--dim);font-style:italic}
 
-  @media print{.bar,.status{display:none}body{background:#fff;color:#000}.script{border:0}.field{border:0;background:none;color:#000;padding:0}.script p{color:#000}}
+  @media print{.bar,.status{display:none}body{background:#fff;color:#000}.script{border:0}.field{border:0;background:none;color:#000;padding:0}.script p,.script i{color:#000}.script i{color:#444}}
 </style>
 </head>
 <body>
 <div class="bar">
   <div class="name">4th Space<span>event script</span></div>
   <div class="tools">
+    <div class="langs" role="group" aria-label="Script language">
+      <button type="button" class="btn lang" data-lang="fr" aria-pressed="true">Français</button>
+      <button type="button" class="btn lang" data-lang="en" aria-pressed="false">English</button>
+      <button type="button" class="btn lang" data-lang="bi" aria-pressed="false">FR / EN</button>
+    </div>
     <select class="tod pick" id="pick" aria-label="Choose today's event" hidden></select>
     <button type="button" class="btn" id="fill">Fill from today's event</button>
     <button type="button" class="btn" id="smaller" aria-label="Smaller text">A−</button>
@@ -64,72 +72,27 @@
 
 <main>
 <article class="script">
+  <p class="part" data-part="0"></p>
+  <div data-sec="Greeting"></div>
 
-  <!-- GREETING -->
-  <p class="part">Accueil</p>
-  <p>Bonjour tout le monde, et bienvenue — ou bon retour<br>
-  à L’Espace 4 de l’Université Concordia.<br>
-  Merci d’être avec nous aujourd’hui pour :</p>
+  <textarea class="field" rows="1" data-key="title"></textarea>
+  <textarea class="field" rows="1" data-key="description"></textarea>
+  <textarea class="field" rows="1" data-key="notes1"></textarea>
 
-  <!-- EVENT_TITLE (filled from the calendar) -->
-  <textarea class="field" rows="1" data-key="title" placeholder="Titre de l’événement" aria-label="Titre de l’événement"></textarea>
+  <div data-sec="Territorial"></div>
+  <div data-sec="FourspIntro"></div>
+  <div data-sec="Rules"></div>
 
-  <!-- SUBTITLE (filled from the event page description) -->
-  <textarea class="field" rows="1" data-key="description" placeholder="Sous-titre" aria-label="Sous-titre"></textarea>
-
-  <!-- TOPNOTES (simple text box) -->
-  <textarea class="field" rows="1" data-key="notes1" placeholder="Notes" aria-label="Notes (haut)"></textarea>
-
-  <!-- TERRITORIAL -->
-  <p>Nous aimerions commencer par reconnaître que l’Université Concordia est située en territoire autochtone, lequel n’a jamais été cédé en Tiohtià:ke / Montréal.</p>
-  <p>C’est dans le respect des liens avec le passé, le présent et l’avenir que nous reconnaissons les relations continues entre les Peuples Autochtones et autres personnes de la communauté montréalaise.</p>
-
-  <!-- FOURSPINTRO -->
-  <p>À L’Espace 4, on travaille avec la communauté universitaire<br>
-  pour partager les idées, la recherche et les projets en cours à Concordia.</p>
-
-  <!-- RULES -->
-  <p>La rencontre d’aujourd’hui est en direct sur Zoom et sur YouTube.<br>
-  Vous pouvez poser vos questions et laisser des commentaires dans le clavardage.<br>
-  Pour les personnes dans la salle, si vous souhaitez participer,<br>
-  levez simplement la main — on vous apportera un micro.</p>
-  <p>Sur ce, j’ai maintenant le plaisir de passer la parole à</p>
-
-  <!-- MODERATOR (filled from the event page credits) -->
-  <textarea class="field" rows="1" data-key="speaker" placeholder="Nom et titre" aria-label="Nom et titre"></textarea>
-
-  <!-- LOWNOTES (simple text box) -->
-  <textarea class="field" rows="1" data-key="notes2" placeholder="Notes" aria-label="Notes (bas)"></textarea>
+  <textarea class="field" rows="1" data-key="speaker"></textarea>
+  <textarea class="field" rows="1" data-key="notes2"></textarea>
 
   <hr class="sep">
-
-  <!-- Q&A -->
-  <p class="part">Questions</p>
-  <p>Si vous avez des questions sur Zoom, vous pouvez les ajouter au clavardage.<br>
-  Pour les gens ici, vous pouvez simplement lever la main et nous pourrons vous passer le micro.</p>
+  <p class="part" data-part="1"></p>
+  <div data-sec="Questions"></div>
 
   <hr class="sep">
-
-  <!-- CONCLUSION -->
-  <p class="part">Conclusion</p>
-  <p>Merci à toutes et à tous d’avoir été avec nous aujourd’hui à l’Espace 4,<br>
-  et d’avoir pris part à cette conversation.<br>
-  Nous allons maintenant mettre fin à la réunion Zoom ainsi qu’à la diffusion en direct,<br>
-  mais sachez que la conversation est déjà accessible sur notre chaîne YouTube.</p>
-
-  <p>On vous souhaite une bonne
-    <select class="tod" id="tod" aria-label="Moment de la journée">
-      <option value="matinée">matinée</option>
-      <option value="avant-midi">avant-midi</option>
-      <option value="journée">journée</option>
-      <option value="après-midi">après-midi</option>
-      <option value="soirée">soirée</option>
-      <option value="fin de semaine">fin de semaine</option>
-    </select>
-    — et à bientôt!</p>
-
-  <p>Vous pouvez activer les sous-titres sur Zoom dans la langue de votre choix.<br>
-  Pour ceux qui sont avec nous dans la salle, une traduction en anglais est disponible via radio. Vous trouverez les récepteurs sur la table à l’entrée.</p>
+  <p class="part" data-part="2"></p>
+  <div data-sec="Conclusion"></div>
 </article>
 </main>
 <div class="status" id="status" aria-live="polite"></div>
@@ -137,11 +100,22 @@
 <script>
 (function(){
   var KEY = '4thspace-event-script-v1';
+  var BASE = 'https://cu4thspace.github.io/INTROS/';
+  var SOURCES = { fr: BASE + 'STRUCTURED_FR.html', en: BASE + 'STRUCTURED_ENG.html', bi: BASE + 'STRUCTURED_BILINGUAL.html' };
+  var UI = {
+    fr: { html: 'fr', parts: ['Accueil', 'Questions', 'Conclusion'], title: 'Titre de l’événement', description: 'Sous-titre', notes: 'Notes', speaker: 'Nom et titre' },
+    en: { html: 'en', parts: ['Welcome', 'Questions', 'Closing'], title: 'Event title', description: 'Subtitle', notes: 'Notes', speaker: 'Name and title' },
+    bi: { html: 'fr', parts: ['Accueil / Welcome', 'Questions', 'Conclusion / Closing'], title: 'Titre de l’événement / Event title', description: 'Sous-titre / Subtitle', notes: 'Notes', speaker: 'Nom et titre / Name and title' }
+  };
+
   var fields = document.querySelectorAll('.field');
-  var tod = document.getElementById('tod');
   var statusEl = document.getElementById('status');
   var clearBtn = document.getElementById('clear');
+  var langBtns = document.querySelectorAll('.lang');
   var size = 1.9; // rem
+  var lang = 'fr';
+  var tods = {};      // chosen time-of-day wording, per language
+  var todOpts = [];   // options found in the current script's closing line
   var statusTimer;
 
   function grow(el){ el.style.height = 'auto'; el.style.height = el.scrollHeight + 'px'; }
@@ -151,21 +125,13 @@
     clearTimeout(statusTimer);
     statusTimer = setTimeout(function(){ statusEl.textContent = ''; }, ms || 2000);
   }
-  function defaultTod(){
-    var h = new Date().getHours();
-    return h < 12 ? 'matinée' : (h < 17 ? 'après-midi' : 'soirée');
-  }
-  function validTod(v){
-    for (var i = 0; i < tod.options.length; i++){ if (tod.options[i].value === v) return true; }
-    return false;
-  }
   function applySize(){
     document.documentElement.style.setProperty('--size', size + 'rem');
     growAll();
   }
 
   function save(){
-    var data = { tod: tod.value, size: size, fields: {} };
+    var data = { lang: lang, tod: tods, size: size, fields: {} };
     fields.forEach(function(el){ data.fields[el.dataset.key] = el.value; });
     try { localStorage.setItem(KEY, JSON.stringify(data)); say('Saved'); } catch(e) {}
   }
@@ -173,8 +139,8 @@
   function load(){
     var data = null;
     try { data = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch(e) {}
-    // Older saves held English values (morning/afternoon/evening); fall back to the default
-    tod.value = (data && validTod(data.tod)) ? data.tod : defaultTod();
+    if (data && SOURCES[data.lang]) lang = data.lang;
+    if (data && data.tod && typeof data.tod === 'object') tods = data.tod; // older saves held a single string: ignored
     if (data && typeof data.size === 'number') size = data.size;
     if (data && data.fields) {
       fields.forEach(function(el){ el.value = data.fields[el.dataset.key] || ''; });
@@ -185,7 +151,6 @@
   fields.forEach(function(el){
     el.addEventListener('input', function(){ grow(el); save(); });
   });
-  tod.addEventListener('change', save);
   window.addEventListener('resize', growAll);
 
   document.getElementById('smaller').addEventListener('click', function(){
@@ -208,7 +173,8 @@
     disarm();
     fields.forEach(function(el){ el.value = ''; });
     lastAuto = {};
-    tod.value = defaultTod();
+    tods = {};
+    bindTod();
     growAll();
     save();
     say('Cleared');
@@ -219,6 +185,141 @@
     clearBtn.textContent = 'Clear all boxes';
     clearBtn.classList.remove('warn');
   }
+
+  /* ---------- Script text for each language, pulled from the hosted files ---------- */
+  function esc(s){ return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+
+  // Keep only text, line breaks and italics from a source <div>
+  function nodeHTML(n){
+    var s = '';
+    n.childNodes.forEach(function(c){
+      if (c.nodeType === 3) s += esc(c.nodeValue);
+      else if (c.nodeType === 1){
+        if (c.tagName === 'I' || c.tagName === 'EM') s += '<i>' + nodeHTML(c) + '</i>';
+        else if (c.tagName === 'BR') s += '\n';
+        else s += nodeHTML(c);
+      }
+    });
+    return s;
+  }
+
+  // id -> text. The files use "Territorial" twice; the second one is the lower notes box (unused here).
+  function parseSource(text){
+    var doc = new DOMParser().parseFromString(text.replace(/<i\s*\/>/gi, '</i>'), 'text/html');
+    var out = {}, seen = {};
+    doc.querySelectorAll('div[id]').forEach(function(d){
+      var id = d.id.trim();
+      if (seen[id]) id = 'LowNotes';
+      seen[id] = 1;
+      out[id] = nodeHTML(d);
+    });
+    return out;
+  }
+
+  // Blank line = new paragraph, line break = <br>; italics are re-opened on each line so they survive the split
+  function paragraphs(raw){
+    var paras = [], cur = [], depth = 0;
+    raw.replace(/[\u202A-\u202E]/g, '').split('\n').forEach(function(line){
+      line = line.replace(/\s+/g, ' ').trim();
+      if (!line){ if (cur.length){ paras.push(cur); cur = []; } return; }
+      var start = depth > 0;
+      depth = Math.max(0, depth + (line.match(/<i>/g) || []).length - (line.match(/<\/i>/g) || []).length);
+      cur.push((start ? '<i>' : '') + line + (depth > 0 ? '</i>' : ''));
+    });
+    if (cur.length) paras.push(cur);
+    return paras.map(function(p){ return '<p>' + p.join('<br>') + '</p>'; }).join('');
+  }
+
+  var TOD = '@@TOD@@';
+  // Closing line: turn the list of wordings (a **bold list** or a [bracketed list]) into one drop-down
+  function closing(raw){
+    todOpts = [];
+    raw = raw.replace(/ - /g, ' — ');
+    var m = raw.match(/^[ \t]*\*\*([^*\n]+)\*\*[ \t]*$/m);
+    if (m && m[1].indexOf(',') > -1){
+      todOpts = m[1].split(',').map(function(s){ return s.trim(); }).filter(Boolean);
+      raw = raw.replace(m[0], '');
+      var swapped = raw.replace(/(une bonne )(\S+)/i, '$1' + TOD);
+      raw = swapped !== raw ? swapped : raw + '\n' + TOD;
+    } else {
+      var b = raw.match(/\[([^\]]*[,\/][^\]]*)\]/);
+      if (b){
+        todOpts = b[1].split(/\s*[,\/]\s*/).filter(Boolean);
+        raw = raw.replace(b[0], TOD);
+      }
+    }
+    return paragraphs(raw).replace(TOD, '<select class="tod" data-tod aria-label="Moment de la journée"></select>');
+  }
+
+  function defaultIdx(opts){
+    var h = new Date().getHours();
+    var keys = h < 12 ? ['matin', 'morning'] : (h < 17 ? ['après-midi', 'afternoon'] : ['soir', 'evening']);
+    for (var i = 0; i < opts.length; i++){
+      for (var k = 0; k < keys.length; k++){ if (opts[i].toLowerCase().indexOf(keys[k]) > -1) return i; }
+    }
+    return 0;
+  }
+
+  function bindTod(){
+    var sel = document.querySelector('select[data-tod]');
+    if (!sel) return;
+    sel.innerHTML = '';
+    todOpts.forEach(function(t){
+      var o = document.createElement('option');
+      o.value = o.textContent = t;
+      sel.appendChild(o);
+    });
+    sel.selectedIndex = defaultIdx(todOpts);
+    if (tods[lang] && todOpts.indexOf(tods[lang]) > -1) sel.value = tods[lang];
+    sel.addEventListener('change', function(){ tods[lang] = sel.value; save(); });
+  }
+
+  function render(text){
+    var src = parseSource(text);
+    document.querySelectorAll('[data-sec]').forEach(function(el){
+      var id = el.dataset.sec, s = src[id];
+      el.innerHTML = (s == null) ? '' : (id === 'Conclusion' ? closing(s) : paragraphs(s));
+    });
+    bindTod();
+    growAll();
+  }
+
+  function cacheGet(l){ try { return localStorage.getItem(KEY + '-src-' + l); } catch(e){ return null; } }
+  function cacheSet(l, t){ try { localStorage.setItem(KEY + '-src-' + l, t); } catch(e){} }
+
+  function setLang(l){
+    lang = l;
+    var ui = UI[l];
+    document.documentElement.lang = ui.html;
+    langBtns.forEach(function(b){ b.setAttribute('aria-pressed', b.dataset.lang === l ? 'true' : 'false'); });
+    document.querySelectorAll('[data-part]').forEach(function(p){ p.textContent = ui.parts[+p.dataset.part]; });
+    fields.forEach(function(el){
+      var k = el.dataset.key;
+      var ph = k === 'title' ? ui.title : k === 'description' ? ui.description : k === 'speaker' ? ui.speaker : ui.notes;
+      el.placeholder = ph;
+      el.setAttribute('aria-label', ph);
+    });
+    var cached = cacheGet(l);
+    if (cached) render(cached); else say('Loading script…', 4000);
+    fetch(SOURCES[l], { cache: 'no-cache', credentials: 'omit' }).then(function(r){
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.text();
+    }).then(function(t){
+      if (t === cached) return;
+      cacheSet(l, t);
+      if (lang === l){ render(t); say('Script updated'); }
+    }).catch(function(){
+      if (lang === l && !cached) say('Could not load the script text for this language', 5000);
+    });
+  }
+
+  langBtns.forEach(function(b){
+    b.addEventListener('click', function(){
+      if (b.dataset.lang === lang) return;
+      setLang(b.dataset.lang);
+      save();
+    });
+  });
 
   /* ---------- Fill title, subtitle and names from today's event on concordia.ca ---------- */
   var LIST_URL = "https://www.concordia.ca/next-gen/4th-space/programming/fullcalendar.html";
@@ -422,6 +523,7 @@
   pick.addEventListener('change', doFill);
 
   load();
+  setLang(lang);
 })();
 </script>
 </body>
