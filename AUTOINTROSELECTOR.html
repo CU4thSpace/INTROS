@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://use.typekit.net/paf7uxj.css">
+<title>Concordia 4th Space – Event Script</title>
+<style>
+  :root{
+    --bg:#111; --ink:#ccc; --white:#fff; --dim:rgba(255,255,255,0.55);
+    --field:rgba(255,255,255,0.08); --field-line:rgba(255,255,255,0.35);
+    --btn:rgba(255,255,255,0.2); --btn-hover:rgba(255,255,255,0.4);
+    --font:"gill-sans-nova-condensed","Gill Sans Nova","Gill Sans MT Condensed","Gill Sans","Arial Narrow",sans-serif;
+    --size:1.9rem;
+  }
+  *,*::before,*::after{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);line-height:1.2}
+
+  .bar{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;
+    padding:.6rem 1.25rem;background:var(--bg);border-bottom:1px solid rgba(255,255,255,0.2)}
+  .bar .name{font-size:1.4rem;font-weight:bold;color:var(--white)}
+  .bar .name span{font-weight:100;font-style:italic;color:var(--ink);margin-left:.5rem}
+  .tools{display:flex;gap:10px;align-items:center}
+  .btn{font-family:var(--font);font-size:1.2rem;color:var(--white);background:var(--btn);border:none;border-radius:8px;
+    min-width:50px;height:50px;padding:0 1rem;cursor:pointer}
+  .btn:hover{background:var(--btn-hover)}
+  .btn.warn{background:#912338}
+  .btn:focus-visible,.field:focus-visible,.tod:focus-visible{outline:3px solid var(--white);outline-offset:2px}
+
+  main{max-width:62rem;margin:2rem auto 5rem;padding:0 1.25rem}
+  .script{border:6px solid var(--white);padding:clamp(1.25rem,4vw,3rem)}
+  .script p{margin:0 0 1.1em;font-size:var(--size);opacity:.95}
+  .part{font-size:1.4rem !important;font-weight:100;font-style:italic;color:var(--dim);letter-spacing:.02em;opacity:1 !important}
+
+  .field{display:block;width:100%;margin:0 0 .9rem;padding:.5rem .8rem;resize:none;overflow:hidden;min-height:3.2rem;
+    font-family:var(--font);font-size:var(--size);line-height:1.2;color:var(--white);
+    background:var(--field);border:2px dashed var(--field-line);border-radius:8px}
+  .field::placeholder{color:var(--dim);font-weight:100;font-style:italic}
+  .field:not(:placeholder-shown){border-style:solid;border-color:var(--white);font-weight:bold}
+
+  .sep{border:0;border-top:2px solid rgba(255,255,255,0.25);margin:2.5rem 0}
+  .tod{font-family:var(--font);font-size:inherit;font-weight:bold;color:var(--white);background:var(--field);
+    border:2px solid var(--white);border-radius:8px;padding:0 .4rem}
+  .tod option{background:#222;color:#fff}
+  .pick{font-size:1.1rem;height:50px;max-width:18rem;padding:0 .6rem}
+  [hidden]{display:none !important}
+
+  .status{position:fixed;left:1.25rem;bottom:1rem;font-size:1rem;color:var(--dim);font-style:italic}
+
+  @media print{.bar,.status{display:none}body{background:#fff;color:#000}.script{border:0}.field{border:0;background:none;color:#000;padding:0}.script p{color:#000}}
+</style>
+</head>
+<body>
+<div class="bar">
+  <div class="name">4th Space<span>event script</span></div>
+  <div class="tools">
+    <select class="tod pick" id="pick" aria-label="Choose today's event" hidden></select>
+    <button type="button" class="btn" id="fill">Fill from today's event</button>
+    <button type="button" class="btn" id="smaller" aria-label="Smaller text">A−</button>
+    <button type="button" class="btn" id="larger" aria-label="Larger text">A+</button>
+    <button type="button" class="btn" id="clear">Clear all boxes</button>
+  </div>
+</div>
+
+<main>
+<article class="script">
+
+  <!-- GREETING -->
+  <p class="part">Accueil</p>
+  <p>Bonjour tout le monde, et bienvenue — ou bon retour<br>
+  à L’Espace 4 de l’Université Concordia.<br>
+  Merci d’être avec nous aujourd’hui pour :</p>
+
+  <!-- EVENT_TITLE (filled from the calendar) -->
+  <textarea class="field" rows="1" data-key="title" placeholder="Titre de l’événement" aria-label="Titre de l’événement"></textarea>
+
+  <!-- SUBTITLE (filled from the event page description) -->
+  <textarea class="field" rows="1" data-key="description" placeholder="Sous-titre" aria-label="Sous-titre"></textarea>
+
+  <!-- TOPNOTES (simple text box) -->
+  <textarea class="field" rows="1" data-key="notes1" placeholder="Notes" aria-label="Notes (haut)"></textarea>
+
+  <!-- TERRITORIAL -->
+  <p>Nous aimerions commencer par reconnaître que l’Université Concordia est située en territoire autochtone, lequel n’a jamais été cédé en Tiohtià:ke / Montréal.</p>
+  <p>C’est dans le respect des liens avec le passé, le présent et l’avenir que nous reconnaissons les relations continues entre les Peuples Autochtones et autres personnes de la communauté montréalaise.</p>
+
+  <!-- FOURSPINTRO -->
+  <p>À L’Espace 4, on travaille avec la communauté universitaire<br>
+  pour partager les idées, la recherche et les projets en cours à Concordia.</p>
+
+  <!-- RULES -->
+  <p>La rencontre d’aujourd’hui est en direct sur Zoom et sur YouTube.<br>
+  Vous pouvez poser vos questions et laisser des commentaires dans le clavardage.<br>
+  Pour les personnes dans la salle, si vous souhaitez participer,<br>
+  levez simplement la main — on vous apportera un micro.</p>
+  <p>Sur ce, j’ai maintenant le plaisir de passer la parole à</p>
+
+  <!-- MODERATOR (filled from the event page credits) -->
+  <textarea class="field" rows="1" data-key="speaker" placeholder="Nom et titre" aria-label="Nom et titre"></textarea>
+
+  <!-- LOWNOTES (simple text box) -->
+  <textarea class="field" rows="1" data-key="notes2" placeholder="Notes" aria-label="Notes (bas)"></textarea>
+
+  <hr class="sep">
+
+  <!-- Q&A -->
+  <p class="part">Questions</p>
+  <p>Si vous avez des questions sur Zoom, vous pouvez les ajouter au clavardage.<br>
+  Pour les gens ici, vous pouvez simplement lever la main et nous pourrons vous passer le micro.</p>
+
+  <hr class="sep">
+
+  <!-- CONCLUSION -->
+  <p class="part">Conclusion</p>
+  <p>Merci à toutes et à tous d’avoir été avec nous aujourd’hui à l’Espace 4,<br>
+  et d’avoir pris part à cette conversation.<br>
+  Nous allons maintenant mettre fin à la réunion Zoom ainsi qu’à la diffusion en direct,<br>
+  mais sachez que la conversation est déjà accessible sur notre chaîne YouTube.</p>
+
+  <p>On vous souhaite une bonne
+    <select class="tod" id="tod" aria-label="Moment de la journée">
+      <option value="matinée">matinée</option>
+      <option value="avant-midi">avant-midi</option>
+      <option value="journée">journée</option>
+      <option value="après-midi">après-midi</option>
+      <option value="soirée">soirée</option>
+      <option value="fin de semaine">fin de semaine</option>
+    </select>
+    — et à bientôt!</p>
+
+  <p>Vous pouvez activer les sous-titres sur Zoom dans la langue de votre choix.<br>
+  Pour ceux qui sont avec nous dans la salle, une traduction en anglais est disponible via radio. Vous trouverez les récepteurs sur la table à l’entrée.</p>
+</article>
+</main>
+<div class="status" id="status" aria-live="polite"></div>
+
+<script>
+(function(){
+  var KEY = '4thspace-event-script-v1';
+  var fields = document.querySelectorAll('.field');
+  var tod = document.getElementById('tod');
+  var statusEl = document.getElementById('status');
+  var clearBtn = document.getElementById('clear');
+  var size = 1.9; // rem
+  var statusTimer;
+
+  function grow(el){ el.style.height = 'auto'; el.style.height = el.scrollHeight + 'px'; }
+  function growAll(){ fields.forEach(grow); }
+  function say(msg, ms){
+    statusEl.textContent = msg;
+    clearTimeout(statusTimer);
+    statusTimer = setTimeout(function(){ statusEl.textContent = ''; }, ms || 2000);
+  }
+  function defaultTod(){
+    var h = new Date().getHours();
+    return h < 12 ? 'matinée' : (h < 17 ? 'après-midi' : 'soirée');
+  }
+  function validTod(v){
+    for (var i = 0; i < tod.options.length; i++){ if (tod.options[i].value === v) return true; }
+    return false;
+  }
+  function applySize(){
+    document.documentElement.style.setProperty('--size', size + 'rem');
+    growAll();
+  }
+
+  function save(){
+    var data = { tod: tod.value, size: size, fields: {} };
+    fields.forEach(function(el){ data.fields[el.dataset.key] = el.value; });
+    try { localStorage.setItem(KEY, JSON.stringify(data)); say('Saved'); } catch(e) {}
+  }
+
+  function load(){
+    var data = null;
+    try { data = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch(e) {}
+    // Older saves held English values (morning/afternoon/evening); fall back to the default
+    tod.value = (data && validTod(data.tod)) ? data.tod : defaultTod();
+    if (data && typeof data.size === 'number') size = data.size;
+    if (data && data.fields) {
+      fields.forEach(function(el){ el.value = data.fields[el.dataset.key] || ''; });
+    }
+    applySize();
+  }
+
+  fields.forEach(function(el){
+    el.addEventListener('input', function(){ grow(el); save(); });
+  });
+  tod.addEventListener('change', save);
+  window.addEventListener('resize', growAll);
+
+  document.getElementById('smaller').addEventListener('click', function(){
+    size = Math.max(1.1, +(size - 0.2).toFixed(1)); applySize(); save();
+  });
+  document.getElementById('larger').addEventListener('click', function(){
+    size = Math.min(4, +(size + 0.2).toFixed(1)); applySize(); save();
+  });
+
+  // Two-step clear so it can't be wiped by one stray click
+  var armed = false, armTimer;
+  clearBtn.addEventListener('click', function(){
+    if (!armed) {
+      armed = true;
+      clearBtn.textContent = 'Click again to clear';
+      clearBtn.classList.add('warn');
+      armTimer = setTimeout(disarm, 3000);
+      return;
+    }
+    disarm();
+    fields.forEach(function(el){ el.value = ''; });
+    lastAuto = {};
+    tod.value = defaultTod();
+    growAll();
+    save();
+    say('Cleared');
+  });
+  function disarm(){
+    armed = false;
+    clearTimeout(armTimer);
+    clearBtn.textContent = 'Clear all boxes';
+    clearBtn.classList.remove('warn');
+  }
+
+  /* ---------- Fill title, subtitle and names from today's event on concordia.ca ---------- */
+  var LIST_URL = "https://www.concordia.ca/next-gen/4th-space/programming/fullcalendar.html";
+  var fillBtn = document.getElementById('fill');
+  var pick = document.getElementById('pick');
+  var todays = [], listLoaded = false, lastAuto = {};
+
+  function clean(str){ return (str || '').replace(/\s+/g, ' ').trim(); }
+
+  function fetchText(url){
+    return fetch(url, { credentials: 'omit' }).then(function(r){
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.text();
+    });
+  }
+
+  function todayString(){
+    var d = new Date();
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
+
+  // Event links on the calendar page carry the date in the URL (/YYYY/MM/DD/)
+  function findToday(html){
+    var doc = new DOMParser().parseFromString(html, 'text/html');
+    var today = todayString(), seen = {}, out = [];
+    doc.querySelectorAll('a[href*="/cuevents/"]').forEach(function(a){
+      var href = a.getAttribute('href');
+      if (!href) return;
+      var m = href.match(/\/(\d{4})\/(\d{2})\/(\d{2})\//);
+      if (!m || (m[1] + '-' + m[2] + '-' + m[3]) !== today) return;
+      var link;
+      try { link = new URL(href, LIST_URL).href.replace(/^http:/, 'https:'); } catch(e){ return; }
+      var title = clean(a.textContent) || clean(a.getAttribute('title'));
+      if (!title || seen[link]) return;
+      seen[link] = 1;
+      out.push({ title: title, link: link });
+    });
+    return out;
+  }
+
+  // The elements (paragraphs and lists) inside the event's Credits section
+  function creditsElements(doc){
+    var body = null;
+    doc.querySelectorAll('.accordion-header').forEach(function(h){
+      if (body) return;
+      if (clean(h.textContent).toUpperCase().indexOf('CREDIT') === 0){
+        var item = h.closest('.accordion-item');
+        body = item ? item.querySelector('.accordion-body') : null;
+      }
+    });
+    if (body){
+      var rte = body.querySelector('.rte') || body;
+      return Array.prototype.filter.call(rte.children, function(c){ return c.tagName === 'P' || c.tagName === 'UL'; });
+    }
+    // Fallback: a heading that starts with "Credits"; read until the next heading of the same level or higher, or a rule
+    var els = [], heads = doc.querySelectorAll('h1, h2, h3, h4');
+    for (var i = 0; i < heads.length; i++){
+      if (clean(heads[i].textContent).toUpperCase().indexOf('CREDIT') !== 0) continue;
+      var level = +heads[i].tagName.charAt(1);
+      var sib = heads[i].nextElementSibling;
+      while (sib && sib.tagName !== 'HR' && !(/^H[1-6]$/.test(sib.tagName) && +sib.tagName.charAt(1) <= level)){
+        if (sib.tagName === 'P' || sib.tagName === 'UL') els.push(sib);
+        else sib.querySelectorAll('p, ul').forEach(function(x){ if (!x.closest('li')) els.push(x); });
+        sib = sib.nextElementSibling;
+      }
+      break;
+    }
+    return els;
+  }
+
+  var KNOWN_LABELS = /^(description|organi[sz]ed by|participants?|with|speakers?|moderator|moderated by|hosted by|presented by|in partnership with|supported by|spectrum id)$/i;
+
+  // Everything in the Credits section as text lines: each bold label with its value or list
+  // (Spectrum ID is left out, as on the credits feed page). Speakers are merged into Participants.
+  function creditsText(html){
+    var doc = new DOMParser().parseFromString(html, 'text/html');
+    var sections = [], cur = null;
+
+    creditsElements(doc).forEach(function(el){
+      if (el.tagName === 'UL'){
+        if (cur) el.querySelectorAll('li').forEach(function(li){
+          var t = clean(li.textContent);
+          if (t) cur.items.push(t);
+        });
+        return;
+      }
+      el.innerHTML.split(/<br\s*\/?>/i).forEach(function(part){
+        var tmp = document.createElement('div');
+        tmp.innerHTML = part;
+        var b = tmp.querySelector('b, strong');
+        var raw = b ? clean(b.textContent) : '';
+        var label = raw.replace(/:$/, '');
+        if (b && label && (/:$/.test(raw) || KNOWN_LABELS.test(label))){
+          b.remove();
+          cur = { label: label, value: clean(tmp.textContent).replace(/^:\s*/, ''), items: [] };
+          sections.push(cur);
+        } else if (cur){
+          var t = clean(tmp.textContent);
+          if (t) cur.items.push(t);
+        }
+      });
+    });
+
+    sections = sections.filter(function(sec){ return !/^spectrum id$/i.test(sec.label); });
+
+    // The Description goes to its own box (Subtitle), so take it out of the credits list
+    var description = '';
+    sections = sections.filter(function(sec){
+      if (!/^description$/i.test(sec.label)) return true;
+      description = [sec.value].concat(sec.items).filter(Boolean).join('\n');
+      return false;
+    });
+
+    // Speakers listed under their own heading on the page
+    var speakers = [];
+    doc.querySelectorAll('h2, h3').forEach(function(h){
+      var t = clean(h.textContent).toLowerCase();
+      if (['speakers', 'speaker', 'panelists', 'panellists'].indexOf(t) === -1) return;
+      var sib = h.nextElementSibling;
+      while (sib && ['H1', 'H2', 'HR'].indexOf(sib.tagName) === -1){
+        if (sib.tagName === 'H3' || sib.tagName === 'H4'){
+          var n = clean(sib.textContent);
+          if (n) speakers.push(n);
+        }
+        sib = sib.nextElementSibling;
+      }
+    });
+    if (speakers.length){
+      var part = null;
+      sections.forEach(function(sec){ if (!part && /^participants?$/i.test(sec.label)) part = sec; });
+      if (!part){ part = { label: 'Speakers', value: '', items: [] }; sections.push(part); }
+      var have = part.items.map(function(n){ return n.toLowerCase(); });
+      speakers.forEach(function(n){
+        if (have.indexOf(n.toLowerCase()) === -1){ part.items.push(n); have.push(n.toLowerCase()); }
+      });
+    }
+
+    var lines = [];
+    sections.forEach(function(sec){
+      var items = sec.items.filter(function(n){ return !/^tba$/i.test(n); });
+      var value = /^tba$/i.test(sec.value) ? '' : sec.value;
+      if (!value && !items.length) return;
+      if (lines.length) lines.push('');
+      lines.push(value ? sec.label + ': ' + value : sec.label + ':');
+      items.forEach(function(n){ lines.push(n); });
+    });
+    return { description: description, credits: lines.join('\n') };
+  }
+
+  // Only overwrite a box if it is empty or still holds text this button put there
+  function setField(key, val){
+    var el = document.querySelector('.field[data-key="' + key + '"]');
+    if (!el || !val) return;
+    if (el.value === '' || el.value === lastAuto[key]){
+      el.value = val;
+      lastAuto[key] = val;
+      grow(el);
+    }
+  }
+
+  function doFill(){
+    if (!todays.length){ say('No event found on the calendar for today', 4000); return Promise.resolve(); }
+    var ev = todays[pick.selectedIndex > 0 ? pick.selectedIndex : 0];
+    setField('title', ev.title);
+    save();
+    say('Title filled. Looking up credits…', 4000);
+    return fetchText(ev.link).then(creditsText).then(function(c){
+      setField('description', c.description);
+      setField('speaker', c.credits);
+      save();
+      say((c.description || c.credits) ? 'Filled from the event page' : 'Title filled. No credits listed on the event page', 4000);
+    }).catch(function(){
+      say('Title filled. Could not load the credits', 4000);
+    });
+  }
+
+  fillBtn.addEventListener('click', function(){
+    fillBtn.disabled = true;
+    var job;
+    if (listLoaded){
+      job = doFill();
+    } else {
+      say('Looking up today’s event…', 6000);
+      job = fetchText(LIST_URL).then(function(html){
+        todays = findToday(html);
+        listLoaded = true;
+        pick.innerHTML = '';
+        todays.forEach(function(ev){
+          var o = document.createElement('option');
+          o.textContent = ev.title;
+          pick.appendChild(o);
+        });
+        pick.hidden = todays.length < 2;
+        return doFill();
+      }).catch(function(){
+        say('Could not reach concordia.ca from this page', 5000);
+      });
+    }
+    job.then(function(){ fillBtn.disabled = false; });
+  });
+  pick.addEventListener('change', doFill);
+
+  load();
+})();
+</script>
+</body>
+</html>
