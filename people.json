@@ -1,0 +1,17 @@
+{
+  "_note": "Demo entries only. Replace with real people. 'aliases' catches variants (accents, Dr./Prof., nicknames). 'title' is optional and shows small on the chip.",
+  "people": [
+    {
+      "name": "Jane Example",
+      "aliases": ["Dr. Jane Example", "J. Example"],
+      "title": "Professor, Dept. of Examples",
+      "url": "https://www.concordia.ca/faculty/jane-example.html"
+    },
+    {
+      "name": "Jean-Luc Exemple",
+      "aliases": ["Jean Luc Exemple", "Pr Jean-Luc Exemple"],
+      "title": "Director, Example Centre",
+      "url": "https://www.concordia.ca/artsci/example-centre.html"
+    }
+  ]
+}
