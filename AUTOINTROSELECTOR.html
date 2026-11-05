@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="https://use.typekit.net/paf7uxj.css">
-<title>Concordia 4th Space – INTRODUCTION v1.4</title>
+<title>Concordia 4th Space – Introduction Script v1.5</title>
 <style>
   :root{
     --bg:#111; --ink:#ccc; --white:#fff; --dim:rgba(255,255,255,0.55);
@@ -41,23 +41,26 @@
   .field::placeholder{color:var(--dim);font-weight:100;font-style:italic}
   .field:not(:placeholder-shown){border-style:solid;border-color:var(--white);font-weight:bold}
 
-  /* Directory chips: sit under the Moderator box, never write into it */
-  .chips{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:-.4rem 0 1.1rem;font-family:var(--font);font-size:1.05rem}
-  .chips:empty{display:none}
-  .chips .lbl{color:var(--dim);font-style:italic;margin-right:2px}
-  .chip{display:inline-flex;align-items:center;gap:6px;padding:.3rem .8rem;border-radius:999px;font-family:var(--font);font-size:1.05rem;
-    line-height:1.1;color:var(--white);background:var(--field);border:1.5px solid var(--white);text-decoration:none;cursor:pointer}
-  .chip:hover{background:var(--btn-hover)}
-  .chip small{color:var(--dim);font-style:italic;font-size:.9em}
-  .chip.ok::before{content:"✓";color:#8fd0ff;font-weight:bold}
-  .chip.new{border-style:dashed;border-color:var(--field-line);color:var(--ink)}
+  /* Directory section: its own block at the bottom of the page */
+  .dir{margin-top:2rem;padding:1.25rem clamp(1.25rem,4vw,3rem) 1.5rem;border:2px solid rgba(255,255,255,0.3);border-radius:12px}
+  .dir h2{margin:0 0 .2rem;font-size:1.4rem;font-weight:bold;color:var(--white)}
+  .dir h2 span{font-weight:100;font-style:italic;color:var(--dim);margin-left:.5rem;font-size:1.1rem}
+  .dir .hint{margin:0 0 1rem;font-size:1.05rem;color:var(--dim);font-style:italic}
+  .chips{display:flex;flex-wrap:wrap;gap:12px;align-items:center;font-family:var(--font)}
+  .chip{display:inline-flex;align-items:center;gap:8px;padding:.6rem 1.2rem;min-height:3.2rem;border-radius:999px;font-family:var(--font);font-size:1.35rem;
+    line-height:1.1;color:#1d1d1d;background:#bfe3d0;border:2px solid transparent;text-decoration:none;cursor:pointer;font-weight:bold}
+  .chip:hover{filter:brightness(1.08)}
+  .chip small{color:#3d3d3d;font-style:italic;font-weight:normal;font-size:.8em}
+  .chip.ok{background:#bfe3d0}
+  .chip.ok::before{content:"✓";font-weight:bold}
+  .chip.new{background:#fde8b8}
   .chip.new::before{content:"＋"}
-  .chip.mini{border-color:var(--field-line);color:var(--dim);font-size:.95rem}
-  .chip.find{border:0;background:none;color:var(--dim);padding:.3rem .2rem;text-decoration:underline;font-size:.95rem}
-  .chipedit{display:inline-flex;gap:6px;align-items:center;flex-wrap:wrap}
-  .chipedit b{color:var(--white)}
-  .chipedit input{font-family:var(--font);font-size:1.05rem;color:var(--white);background:var(--field);border:2px solid var(--white);
-    border-radius:8px;padding:.3rem .6rem;width:22rem;max-width:100%}
+  .chip.mini{background:#d9cff2;font-size:1.15rem;min-height:2.8rem}
+  .chip.find{background:#cfe4f7;font-size:1.15rem;min-height:2.8rem;font-weight:normal}
+  .chipedit{display:inline-flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .chipedit b{color:var(--white);font-size:1.35rem}
+  .chipedit input{font-family:var(--font);font-size:1.3rem;color:var(--white);background:var(--field);border:2px solid var(--white);
+    border-radius:10px;padding:.55rem .9rem;width:26rem;max-width:100%}
 
   .sep{border:0;border-top:2px solid rgba(255,255,255,0.25);margin:2.5rem 0}
   .tod{font-family:var(--font);font-size:inherit;font-weight:bold;color:var(--white);background:var(--field);
@@ -68,12 +71,12 @@
 
   .status{position:fixed;left:1.25rem;bottom:1rem;font-size:1rem;color:var(--dim);font-style:italic}
 
-  @media print{.bar,.status,.chips{display:none}body{background:#fff;color:#000}.script{border:0}.field{border:0;background:none;color:#000;padding:0}.script p,.script i{color:#000}.script i{color:#1a5a8a}}
+  @media print{.bar,.status,.dir{display:none}body{background:#fff;color:#000}.script{border:0}.field{border:0;background:none;color:#000;padding:0}.script p,.script i{color:#000}.script i{color:#1a5a8a}}
 </style>
 </head>
 <body>
 <div class="bar">
-  <div class="name">4th Space<span>INTRODUCTION Script v1.4</span></div>
+  <div class="name">4th Space<span>Introduction Script v1.5</span></div>
   <div class="tools">
     <div class="langs" role="group" aria-label="Script language">
       <button type="button" class="btn lang" data-lang="fr" aria-pressed="true">Français</button>
@@ -102,7 +105,6 @@
   <div data-sec="Rules"></div>
 
   <textarea class="field" rows="1" data-key="speaker"></textarea>
-  <div class="chips" id="chips" aria-live="polite"></div>
   <textarea class="field" rows="1" data-key="notes2"></textarea>
 
   <hr class="sep">
@@ -113,6 +115,12 @@
   <p class="part" data-part="2"></p>
   <div data-sec="Conclusion"></div>
 </article>
+
+<section class="dir" id="dir" aria-labelledby="dirh" hidden>
+  <h2 id="dirh">Directory<span id="dirnote"></span></h2>
+  <p class="hint">Names found in the Moderator box. Green links open the profile; yellow ones need a link.</p>
+  <div class="chips" id="chips" aria-live="polite"></div>
+</section>
 </main>
 <div class="status" id="status" aria-live="polite"></div>
 
@@ -351,6 +359,8 @@
      people.json (hosted next to this page) holds the confirmed names. Links you confirm here
      are kept in this browser until you copy them into people.json. The box itself is never changed. */
   var chipsEl = document.getElementById('chips');
+  var dirEl = document.getElementById('dir');
+  var dirNote = document.getElementById('dirnote');
   var LKEY = KEY + '-people';
   var DEMO = [
     { name: 'Jane Example', aliases: ['Dr. Jane Example'], title: 'Professor, Dept. of Examples', url: 'https://www.concordia.ca/faculty/jane-example.html' },
@@ -403,6 +413,7 @@
 
   function updateChips(){
     chipsEl.innerHTML = '';
+    dirEl.hidden = true;
     var text = speakerEl.value;
     if (!text.trim()) return;
     var hay = ' ' + nkey(text) + ' ', found = [], keys = [];
@@ -421,10 +432,8 @@
     });
     if (!found.length && !unknown.length) return;
 
-    var lbl = document.createElement('span');
-    lbl.className = 'lbl';
-    lbl.textContent = 'Directory' + (usingDemo ? ' (demo list)' : '') + ':';
-    chipsEl.appendChild(lbl);
+    dirEl.hidden = false;
+    dirNote.textContent = usingDemo ? '(demo list)' : '';
 
     found.forEach(function(p){
       var a = document.createElement('a');
