@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="https://use.typekit.net/paf7uxj.css">
-<title>Concordia 4th Space – Introduction Script v1.5</title>
+<title>Concordia 4th Space – Event Script</title>
 <style>
   :root{
     --bg:#111; --ink:#ccc; --white:#fff; --dim:rgba(255,255,255,0.55);
@@ -27,7 +27,7 @@
   .btn:hover{background:var(--btn-hover)}
   .btn.warn{background:#912338}
   .btn[aria-pressed="true"]{background:var(--white);color:#111;font-weight:bold}
-  .btn:focus-visible,.field:focus-visible,.tod:focus-visible,.chip:focus-visible,.chipedit input:focus-visible{outline:3px solid var(--white);outline-offset:2px}
+  .btn:focus-visible,.field:focus-visible,.tod:focus-visible,.chip:focus-visible{outline:3px solid var(--white);outline-offset:2px}
 
   main{max-width:62rem;margin:2rem auto 5rem;padding:0 1.25rem}
   .script{border:6px solid var(--white);padding:clamp(1.25rem,4vw,3rem)}
@@ -46,21 +46,14 @@
   .dir h2{margin:0 0 .2rem;font-size:1.4rem;font-weight:bold;color:var(--white)}
   .dir h2 span{font-weight:100;font-style:italic;color:var(--dim);margin-left:.5rem;font-size:1.1rem}
   .dir .hint{margin:0 0 1rem;font-size:1.05rem;color:var(--dim);font-style:italic}
-  .chips{display:flex;flex-wrap:wrap;gap:12px;align-items:center;font-family:var(--font)}
-  .chip{display:inline-flex;align-items:center;gap:8px;padding:.6rem 1.2rem;min-height:3.2rem;border-radius:999px;font-family:var(--font);font-size:1.35rem;
-    line-height:1.1;color:#1d1d1d;background:#bfe3d0;border:2px solid transparent;text-decoration:none;cursor:pointer;font-weight:bold}
+  .chips{font-family:var(--font)}
+  .person{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin:0 0 .9rem}
+  .pname{font-size:1.5rem;font-weight:bold;color:var(--white);min-width:14rem}
+  .chip{display:inline-flex;align-items:center;padding:.6rem 1.2rem;min-height:3.2rem;border-radius:999px;font-family:var(--font);font-size:1.3rem;
+    line-height:1.1;color:#1d1d1d;border:2px solid transparent;text-decoration:none;cursor:pointer;font-weight:bold}
   .chip:hover{filter:brightness(1.08)}
-  .chip small{color:#3d3d3d;font-style:italic;font-weight:normal;font-size:.8em}
-  .chip.ok{background:#bfe3d0}
-  .chip.ok::before{content:"✓";font-weight:bold}
-  .chip.new{background:#fde8b8}
-  .chip.new::before{content:"＋"}
-  .chip.mini{background:#d9cff2;font-size:1.15rem;min-height:2.8rem}
-  .chip.find{background:#cfe4f7;font-size:1.15rem;min-height:2.8rem;font-weight:normal}
-  .chipedit{display:inline-flex;gap:10px;align-items:center;flex-wrap:wrap}
-  .chipedit b{color:var(--white);font-size:1.35rem}
-  .chipedit input{font-family:var(--font);font-size:1.3rem;color:var(--white);background:var(--field);border:2px solid var(--white);
-    border-radius:10px;padding:.55rem .9rem;width:26rem;max-width:100%}
+  .chip.find{background:#cfe4f7}
+  .chip.web{background:#f7d0e3}
 
   .sep{border:0;border-top:2px solid rgba(255,255,255,0.25);margin:2.5rem 0}
   .tod{font-family:var(--font);font-size:inherit;font-weight:bold;color:var(--white);background:var(--field);
@@ -76,7 +69,7 @@
 </head>
 <body>
 <div class="bar">
-  <div class="name">4th Space<span>Introduction Script v1.5</span></div>
+  <div class="name">4th Space<span>Introduction Script v1.7</span></div>
   <div class="tools">
     <div class="langs" role="group" aria-label="Script language">
       <button type="button" class="btn lang" data-lang="fr" aria-pressed="true">Français</button>
@@ -117,8 +110,8 @@
 </article>
 
 <section class="dir" id="dir" aria-labelledby="dirh" hidden>
-  <h2 id="dirh">Directory<span id="dirnote"></span></h2>
-  <p class="hint">Names found in the Moderator box. Green links open the profile; yellow ones need a link.</p>
+  <h2 id="dirh">Look up names</h2>
+  <p class="hint">Names found in the Moderator box. Blue searches concordia.ca only; pink searches all of Google for the exact name in quotes.</p>
   <div class="chips" id="chips" aria-live="polite"></div>
 </section>
 </main>
@@ -129,7 +122,6 @@
   var KEY = '4thspace-event-script-v1';
   var BASE = 'https://cu4thspace.github.io/INTROS/';
   var SOURCES = { fr: BASE + 'STRUCTURED_FR.html', en: BASE + 'STRUCTURED_ENG.html', bi: BASE + 'STRUCTURED_BILINGUAL.html' };
-  var PEOPLE_URL = BASE + 'people.json';
   var UI = {
     fr: { html: 'fr', parts: ['Accueil', 'Questions', 'Conclusion'], title: 'Titre de l’événement', description: 'Sous-titre', notes: 'Notes', speaker: 'Nom et titre' },
     en: { html: 'en', parts: ['Welcome', 'Questions', 'Closing'], title: 'Event title', description: 'Subtitle', notes: 'Notes', speaker: 'Name and title' },
@@ -355,40 +347,9 @@
     });
   });
 
-  /* ---------- Name → profile links (chips under the Moderator box) ----------
-     people.json (hosted next to this page) holds the confirmed names. Links you confirm here
-     are kept in this browser until you copy them into people.json. The box itself is never changed. */
+  /* ---------- Look up names (two Google searches per name) ---------- */
   var chipsEl = document.getElementById('chips');
   var dirEl = document.getElementById('dir');
-  var dirNote = document.getElementById('dirnote');
-  var LKEY = KEY + '-people';
-  var DEMO = [
-    { name: 'Jane Example', aliases: ['Dr. Jane Example'], title: 'Professor, Dept. of Examples', url: 'https://www.concordia.ca/faculty/jane-example.html' },
-    { name: 'Jean-Luc Exemple', aliases: ['Pr Jean Luc Exemple'], title: 'Director, Example Centre', url: 'https://www.concordia.ca/artsci/example-centre.html' }
-  ];
-  var hosted = [], usingDemo = false, localPeople = [], editing = null;
-  try { localPeople = JSON.parse(localStorage.getItem(LKEY) || '[]') || []; } catch(e){ localPeople = []; }
-
-  // Accents, Dr./Prof./M./Mme titles, punctuation and case are ignored when comparing names
-  function nkey(s){
-    return (s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
-      .replace(/\b(?:dr|dre|prof|pr|mr|mrs|ms|mme|mx|professor|professeure?|doctor)\b\.?|\bm\./g, ' ')
-      .replace(/[^a-z0-9]+/g, ' ').trim();
-  }
-  function allPeople(){ return hosted.concat(localPeople); }
-
-  function loadPeople(){
-    fetch(PEOPLE_URL, { cache: 'no-cache', credentials: 'omit' }).then(function(r){
-      if (!r.ok) throw new Error('HTTP ' + r.status);
-      return r.json();
-    }).then(function(j){
-      hosted = (j && j.people) || [];
-      try { localStorage.setItem(LKEY + '-hosted', JSON.stringify(hosted)); } catch(e){}
-    }).catch(function(){
-      try { hosted = JSON.parse(localStorage.getItem(LKEY + '-hosted') || 'null'); } catch(e){ hosted = null; }
-      if (!hosted || !hosted.length){ hosted = DEMO; usingDemo = true; }
-    }).then(updateChips);
-  }
 
   // Names the page could be speaking about: items under a participants-type label, name-shaped only
   var NAME_LABEL = /particip|speaker|with|moderat|host|present|panel|guest|invit|animat|conférenc|modér|avec|présent/i;
@@ -413,83 +374,27 @@
 
   function updateChips(){
     chipsEl.innerHTML = '';
-    dirEl.hidden = true;
-    var text = speakerEl.value;
-    if (!text.trim()) return;
-    var hay = ' ' + nkey(text) + ' ', found = [], keys = [];
-    allPeople().forEach(function(p){
-      var hit = [p.name].concat(p.aliases || []).some(function(n){
-        var k = nkey(n);
-        if (k && hay.indexOf(' ' + k + ' ') > -1){ keys.push(k); return true; }
+    var seen = {}, names = candidates(speakerEl.value).filter(function(n){
+      var k = n.toLowerCase();
+      if (seen[k]) return false;
+      return (seen[k] = 1);
+    });
+    dirEl.hidden = !names.length;
+    names.forEach(function(n){
+      var row = document.createElement('div');
+      row.className = 'person';
+      var nm = document.createElement('span');
+      nm.className = 'pname'; nm.textContent = n;
+      row.appendChild(nm);
+      [['find', 'Concordia only ↗', 'site:concordia.ca "' + n + '"', 'Google search limited to concordia.ca'],
+       ['web', 'All of Google ↗', '"' + n + '"', 'Google search of the whole web']].forEach(function(b){
+        var a = document.createElement('a');
+        a.className = 'chip ' + b[0]; a.target = '_blank'; a.rel = 'noopener'; a.textContent = b[1]; a.title = b[3];
+        a.href = 'https://www.google.com/search?q=' + encodeURIComponent(b[2]);
+        row.appendChild(a);
       });
-      if (hit) found.push(p);
+      chipsEl.appendChild(row);
     });
-    var seen = {}, unknown = [];
-    candidates(text).forEach(function(n){
-      var k = nkey(n);
-      if (!k || seen[k] || keys.some(function(f){ return f === k || f.indexOf(k) > -1 || k.indexOf(f) > -1; })) return;
-      seen[k] = 1; unknown.push(n);
-    });
-    if (!found.length && !unknown.length) return;
-
-    dirEl.hidden = false;
-    dirNote.textContent = usingDemo ? '(demo list)' : '';
-
-    found.forEach(function(p){
-      var a = document.createElement('a');
-      a.className = 'chip ok';
-      a.href = p.url; a.target = '_blank'; a.rel = 'noopener';
-      a.textContent = p.name;
-      if (p.title){ var s = document.createElement('small'); s.textContent = p.title; a.appendChild(s); }
-      chipsEl.appendChild(a);
-    });
-
-    unknown.forEach(function(n){
-      if (editing === n){
-        var box = document.createElement('span');
-        box.className = 'chipedit';
-        var b = document.createElement('b'); b.textContent = n;
-        var inp = document.createElement('input');
-        inp.type = 'url'; inp.placeholder = 'Paste the profile page link'; inp.setAttribute('aria-label', 'Profile link for ' + n);
-        var ok = document.createElement('button'); ok.type = 'button'; ok.className = 'chip'; ok.textContent = 'Save';
-        var no = document.createElement('button'); no.type = 'button'; no.className = 'chip mini'; no.textContent = 'Cancel';
-        function commit(){
-          var u = inp.value.trim();
-          if (!/^https?:\/\//i.test(u)){ say('Paste a full link starting with https://', 3000); return; }
-          localPeople.push({ name: n, aliases: [], url: u });
-          try { localStorage.setItem(LKEY, JSON.stringify(localPeople)); } catch(e){}
-          editing = null; updateChips(); say('Link saved for ' + n);
-        }
-        ok.addEventListener('click', commit);
-        inp.addEventListener('keydown', function(e){ if (e.key === 'Enter') commit(); if (e.key === 'Escape'){ editing = null; updateChips(); } });
-        no.addEventListener('click', function(){ editing = null; updateChips(); });
-        box.appendChild(b); box.appendChild(inp); box.appendChild(ok); box.appendChild(no);
-        chipsEl.appendChild(box);
-        setTimeout(function(){ inp.focus(); }, 0);
-        return;
-      }
-      var c = document.createElement('button');
-      c.type = 'button'; c.className = 'chip new'; c.textContent = n; c.title = 'Not in the list yet: click to add a link';
-      c.addEventListener('click', function(){ editing = n; updateChips(); });
-      chipsEl.appendChild(c);
-      var f = document.createElement('a');
-      f.className = 'chip find'; f.target = '_blank'; f.rel = 'noopener'; f.textContent = 'search ↗';
-      f.href = 'https://www.google.com/search?q=' + encodeURIComponent('site:concordia.ca "' + n + '"');
-      chipsEl.appendChild(f);
-    });
-
-    if (localPeople.length){
-      var ex = document.createElement('button');
-      ex.type = 'button'; ex.className = 'chip mini';
-      ex.textContent = 'Copy lookup file (' + localPeople.length + ' new)';
-      ex.addEventListener('click', function(){
-        var json = JSON.stringify({ people: allPeople() }, null, 2);
-        (navigator.clipboard ? navigator.clipboard.writeText(json) : Promise.reject()).then(function(){
-          say('Copied. Paste it into people.json on GitHub', 4000);
-        }).catch(function(){ window.prompt('Copy this into people.json', json); });
-      });
-      chipsEl.appendChild(ex);
-    }
   }
 
   /* ---------- Fill title, subtitle and names from today's event on concordia.ca ---------- */
@@ -697,7 +602,6 @@
   load();
   setLang(lang);
   updateChips();
-  loadPeople();
 })();
 </script>
 </body>
