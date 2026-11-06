@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="https://use.typekit.net/paf7uxj.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Lato:wght@400;700&family=Open+Sans:wght@400;700&family=Roboto:wght@400;700&display=swap">
 <title>Concordia 4th Space – Event Script</title>
 <style>
   :root{
@@ -11,6 +14,7 @@
     --field:rgba(255,255,255,0.08); --field-line:rgba(255,255,255,0.35);
     --btn:rgba(255,255,255,0.2); --btn-hover:rgba(255,255,255,0.4);
     --font:"gill-sans-nova-condensed","Gill Sans Nova","Gill Sans MT Condensed","Gill Sans","Arial Narrow",sans-serif;
+    --sfont:var(--font);
     --size:1.9rem;
   }
   *,*::before,*::after{box-sizing:border-box}
@@ -31,6 +35,7 @@
 
   main{max-width:62rem;margin:2rem auto 5rem;padding:0 1.25rem}
   .script{border:6px solid var(--white);padding:clamp(1.25rem,4vw,3rem)}
+  .script,.field{font-family:var(--sfont)}
   .script p{margin:0 0 1.1em;font-size:var(--size);opacity:.95}
   .script i{color:#8fd0ff}
   .part{font-size:1.4rem !important;font-weight:100;font-style:italic;color:var(--dim);letter-spacing:.02em;opacity:1 !important}
@@ -53,11 +58,10 @@
     line-height:1.1;color:#1d1d1d;border:2px solid transparent;text-decoration:none;cursor:pointer;font-weight:bold}
   .chip:hover{filter:brightness(1.08)}
   .chip.find{background:#cfe4f7}
-  .chip.ddg{background:#d6efc7}
   .chip.web{background:#f7d0e3}
 
   .sep{border:0;border-top:2px solid rgba(255,255,255,0.25);margin:2.5rem 0}
-  .tod{font-family:var(--font);font-size:inherit;font-weight:bold;color:var(--white);background:var(--field);
+  .tod{font-family:inherit;font-size:inherit;font-weight:bold;color:var(--white);background:var(--field);
     border:2px solid var(--white);border-radius:8px;padding:0 .4rem;max-width:100%}
   .tod option{background:#222;color:#fff}
   .pick{font-size:1.1rem;height:50px;max-width:18rem;padding:0 .6rem}
@@ -70,13 +74,20 @@
 </head>
 <body>
 <div class="bar">
-  <div class="name">4th Space<span>Introduction Script v1.9</span></div>
+  <div class="name">4th Space<span>Introduction Script v2.0</span></div>
   <div class="tools">
     <div class="langs" role="group" aria-label="Script language">
       <button type="button" class="btn lang" data-lang="fr" aria-pressed="true">Français</button>
       <button type="button" class="btn lang" data-lang="en" aria-pressed="false">English</button>
       <button type="button" class="btn lang" data-lang="bi" aria-pressed="false">Bilingual</button>
     </div>
+    <select class="tod pick" id="fontsel" aria-label="Script font">
+      <option value="default">Font: Gill Sans (default)</option>
+      <option value="atkinson">Font: Atkinson Hyperlegible</option>
+      <option value="opensans">Font: Open Sans</option>
+      <option value="lato">Font: Lato</option>
+      <option value="roboto">Font: Roboto</option>
+    </select>
     <select class="tod pick" id="pick" aria-label="Choose today's event" hidden></select>
     <button type="button" class="btn" id="fill">Fill from today's event</button>
     <button type="button" class="btn" id="smaller" aria-label="Smaller text">A−</button>
@@ -112,7 +123,7 @@
 
 <section class="dir" id="dir" aria-labelledby="dirh" hidden>
   <h2 id="dirh">Look up names</h2>
-  <p class="hint">Names found in the Moderator box. Blue and green jump to the top concordia.ca result (via Google or DuckDuckGo); pink shows Google results for the exact name in quotes.</p>
+  <p class="hint">Names found in the Moderator box. Blue jumps to the top concordia.ca result for the name; pink shows Google results for the exact name in quotes.</p>
   <div class="chips" id="chips" aria-live="polite"></div>
 </section>
 </main>
@@ -134,6 +145,15 @@
   var clearBtn = document.getElementById('clear');
   var langBtns = document.querySelectorAll('.lang');
   var size = 1.9; // rem
+  var font = 'default';
+  var FONTS = {
+    'default': '',
+    atkinson: '"Atkinson Hyperlegible",Verdana,sans-serif',
+    opensans: '"Open Sans",Verdana,sans-serif',
+    lato: '"Lato",Verdana,sans-serif',
+    roboto: '"Roboto",Arial,sans-serif'
+  };
+  var fontSel = document.getElementById('fontsel');
   var lang = 'fr';
   var tods = {};      // chosen time-of-day wording, per language
   var todOpts = [];   // options found in the current script's closing line
@@ -146,13 +166,20 @@
     clearTimeout(statusTimer);
     statusTimer = setTimeout(function(){ statusEl.textContent = ''; }, ms || 2000);
   }
+  function applyFont(){
+    if (FONTS[font]) document.documentElement.style.setProperty('--sfont', FONTS[font]);
+    else document.documentElement.style.removeProperty('--sfont');
+    fontSel.value = font;
+    growAll();
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(growAll);
+  }
   function applySize(){
     document.documentElement.style.setProperty('--size', size + 'rem');
     growAll();
   }
 
   function save(){
-    var data = { lang: lang, tod: tods, size: size, fields: {} };
+    var data = { lang: lang, tod: tods, size: size, font: font, fields: {} };
     fields.forEach(function(el){ data.fields[el.dataset.key] = el.value; });
     try { localStorage.setItem(KEY, JSON.stringify(data)); say('Saved'); } catch(e) {}
   }
@@ -163,10 +190,12 @@
     if (data && SOURCES[data.lang]) lang = data.lang;
     if (data && data.tod && typeof data.tod === 'object') tods = data.tod; // older saves held a single string: ignored
     if (data && typeof data.size === 'number') size = data.size;
+    if (data && FONTS.hasOwnProperty(data.font)) font = data.font;
     if (data && data.fields) {
       fields.forEach(function(el){ el.value = data.fields[el.dataset.key] || ''; });
     }
     applySize();
+    applyFont();
   }
 
   var speakerEl = document.querySelector('.field[data-key="speaker"]');
@@ -178,6 +207,7 @@
     });
   });
   window.addEventListener('resize', growAll);
+  fontSel.addEventListener('change', function(){ font = fontSel.value; applyFont(); save(); });
 
   document.getElementById('smaller').addEventListener('click', function(){
     size = Math.max(1.1, +(size - 0.2).toFixed(1)); applySize(); save();
@@ -387,8 +417,7 @@
       var nm = document.createElement('span');
       nm.className = 'pname'; nm.textContent = n;
       row.appendChild(nm);
-      [['find', 'Concordia top: Google ↗', 'https://www.google.com/search?btnI=I&q=' + encodeURIComponent('site:concordia.ca "' + n + '"'), 'First concordia.ca result via Google (may show a Redirect Notice)'],
-       ['ddg', 'Concordia top: DuckDuckGo ↗', 'https://duckduckgo.com/?q=' + encodeURIComponent('\\site:concordia.ca "' + n + '"'), 'First concordia.ca result via DuckDuckGo'],
+      [['find', 'Concordia top result ↗', 'https://www.google.com/search?btnI=I&q=' + encodeURIComponent('site:concordia.ca "' + n + '"'), 'Opens the first Google result on concordia.ca (Google may show a Redirect Notice first)'],
        ['web', 'All of Google ↗', 'https://www.google.com/search?q=' + encodeURIComponent('"' + n + '"'), 'Google search of the whole web, exact name in quotes']].forEach(function(b){
         var a = document.createElement('a');
         a.className = 'chip ' + b[0]; a.target = '_blank'; a.rel = 'noopener'; a.textContent = b[1]; a.title = b[3]; a.href = b[2];
