@@ -53,6 +53,7 @@
     line-height:1.1;color:#1d1d1d;border:2px solid transparent;text-decoration:none;cursor:pointer;font-weight:bold}
   .chip:hover{filter:brightness(1.08)}
   .chip.find{background:#cfe4f7}
+  .chip.ddg{background:#d6efc7}
   .chip.web{background:#f7d0e3}
 
   .sep{border:0;border-top:2px solid rgba(255,255,255,0.25);margin:2.5rem 0}
@@ -69,7 +70,7 @@
 </head>
 <body>
 <div class="bar">
-  <div class="name">4th Space<span>Introduction Script v1.8</span></div>
+  <div class="name">4th Space<span>Introduction Script v1.9</span></div>
   <div class="tools">
     <div class="langs" role="group" aria-label="Script language">
       <button type="button" class="btn lang" data-lang="fr" aria-pressed="true">Français</button>
@@ -111,7 +112,7 @@
 
 <section class="dir" id="dir" aria-labelledby="dirh" hidden>
   <h2 id="dirh">Look up names</h2>
-  <p class="hint">Names found in the Moderator box. Blue jumps straight to the top concordia.ca result for the name; pink shows Google results for the exact name in quotes.</p>
+  <p class="hint">Names found in the Moderator box. Blue and green jump to the top concordia.ca result (via Google or DuckDuckGo); pink shows Google results for the exact name in quotes.</p>
   <div class="chips" id="chips" aria-live="polite"></div>
 </section>
 </main>
@@ -386,11 +387,11 @@
       var nm = document.createElement('span');
       nm.className = 'pname'; nm.textContent = n;
       row.appendChild(nm);
-      [['find', 'Concordia top result ↗', 'site:concordia.ca "' + n + '"', 'Opens the first Google result on concordia.ca directly'],
-       ['web', 'All of Google ↗', '"' + n + '"', 'Google search of the whole web']].forEach(function(b){
+      [['find', 'Concordia top: Google ↗', 'https://www.google.com/search?btnI=I&q=' + encodeURIComponent('site:concordia.ca "' + n + '"'), 'First concordia.ca result via Google (may show a Redirect Notice)'],
+       ['ddg', 'Concordia top: DuckDuckGo ↗', 'https://duckduckgo.com/?q=' + encodeURIComponent('\\site:concordia.ca "' + n + '"'), 'First concordia.ca result via DuckDuckGo'],
+       ['web', 'All of Google ↗', 'https://www.google.com/search?q=' + encodeURIComponent('"' + n + '"'), 'Google search of the whole web, exact name in quotes']].forEach(function(b){
         var a = document.createElement('a');
-        a.className = 'chip ' + b[0]; a.target = '_blank'; a.rel = 'noopener'; a.textContent = b[1]; a.title = b[3];
-        a.href = 'https://www.google.com/search?q=' + encodeURIComponent(b[2]) + (b[0] === 'find' ? '&btnI=I' : '');
+        a.className = 'chip ' + b[0]; a.target = '_blank'; a.rel = 'noopener'; a.textContent = b[1]; a.title = b[3]; a.href = b[2];
         row.appendChild(a);
       });
       chipsEl.appendChild(row);
