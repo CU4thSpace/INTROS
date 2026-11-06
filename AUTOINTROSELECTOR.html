@@ -30,6 +30,10 @@
     min-width:50px;height:50px;padding:0 1rem;cursor:pointer}
   .btn:hover{background:var(--btn-hover)}
   .btn.warn{background:#912338}
+  .fillrow{display:flex;justify-content:center;align-items:center;gap:16px;flex-wrap:wrap;margin:0 0 1.75rem}
+  .btn.big{font-size:1.9rem;font-weight:bold;height:76px;padding:0 3.25rem;border-radius:12px;background:#912338}
+  .btn.big:hover{background:#a82a42}
+  .btn.big:disabled{opacity:.65;cursor:wait}
   .btn[aria-pressed="true"]{background:var(--white);color:#111;font-weight:bold}
   .btn:focus-visible,.field:focus-visible,.tod:focus-visible,.chip:focus-visible{outline:3px solid var(--white);outline-offset:2px}
 
@@ -69,12 +73,12 @@
 
   .status{position:fixed;left:1.25rem;bottom:1rem;font-size:1rem;color:var(--dim);font-style:italic}
 
-  @media print{.bar,.status,.dir{display:none}body{background:#fff;color:#000}.script{border:0}.field{border:0;background:none;color:#000;padding:0}.script p,.script i{color:#000}.script i{color:#1a5a8a}}
+  @media print{.bar,.status,.dir,.fillrow{display:none}body{background:#fff;color:#000}.script{border:0}.field{border:0;background:none;color:#000;padding:0}.script p,.script i{color:#000}.script i{color:#1a5a8a}}
 </style>
 </head>
 <body>
 <div class="bar">
-  <div class="name">4th Space<span>Introduction Script v2.0</span></div>
+  <div class="name">4th Space<span>Introduction Script v2.1</span></div>
   <div class="tools">
     <div class="langs" role="group" aria-label="Script language">
       <button type="button" class="btn lang" data-lang="fr" aria-pressed="true">Français</button>
@@ -82,14 +86,12 @@
       <button type="button" class="btn lang" data-lang="bi" aria-pressed="false">Bilingual</button>
     </div>
     <select class="tod pick" id="fontsel" aria-label="Script font">
-      <option value="default">Font: Gill Sans (default)</option>
+      <option value="default">Font: Gill Sans</option>
       <option value="atkinson">Font: Atkinson Hyperlegible</option>
       <option value="opensans">Font: Open Sans</option>
       <option value="lato">Font: Lato</option>
       <option value="roboto">Font: Roboto</option>
     </select>
-    <select class="tod pick" id="pick" aria-label="Choose today's event" hidden></select>
-    <button type="button" class="btn" id="fill">Fill from today's event</button>
     <button type="button" class="btn" id="smaller" aria-label="Smaller text">A−</button>
     <button type="button" class="btn" id="larger" aria-label="Larger text">A+</button>
     <button type="button" class="btn" id="clear">Clear all boxes</button>
@@ -97,6 +99,10 @@
 </div>
 
 <main>
+<div class="fillrow">
+  <select class="tod pick" id="pick" aria-label="Choose today's event" hidden></select>
+  <button type="button" class="btn big" id="fill">Fill from today's event</button>
+</div>
 <article class="script">
   <p class="part" data-part="0"></p>
   <div data-sec="Greeting"></div>
